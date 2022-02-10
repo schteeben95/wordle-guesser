@@ -21,3 +21,7 @@ Enter possible letters: ..s..
 Enter avoid letters: t
 The word is pause
 ```
+
+## The Dictionary
+
+The dictionary is taken from https://github.com/dwyl/english-words. Thank you!
