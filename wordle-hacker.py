@@ -1,42 +1,66 @@
 from sys import exit
 
-with open("words_alpha.txt", "r") as f:
+with open("count_1w.txt", "r") as f:
     allWords = f.read().splitlines()
 
-fiveLetters = [w for w in allWords if len(w) == 5]
+wordFreq = [w.split() for w in allWords]
+
+fiveLetters = [w for w in wordFreq if len(w[0]) == 5]
+
+# fiveLetters = ["atame", "acher"]
 
 
 def possibleWords(inputDict, confirmed, possible, avoid):
+    if len(confirmed) < 5:
+        confirmed = confirmed + "." * (5 - len(confirmed))
+    if len(possible) < 5:
+        possible = possible + "." * (5 - len(possible))
     noAvoids = []
-    for word in inputDict:
-        if len([l for l in avoid if l in word]) == 0:
-            noAvoids.append(word)
+    if len(avoid) > 0:
+        for word in inputDict:
+            filterIn = True
+            for i in range(5):
+                if word[0][i] not in confirmed and word[0][i] not in possible:
+                    if word[0][i] in avoid:
+                        filterIn = False
+                        break
+            # if len([l for l in avoid if l in word]) == 0:
+            if filterIn:
+                noAvoids.append(word)
+    else:
+        noAvoids = inputDict
 
     withConfirmed = []
-    for word in noAvoids:
-        filterIn = True
-        for i in range(5):
-            if confirmed[i] != "." and confirmed[i] != word[i]:
-                filterIn = False
-                break
-        if filterIn:
-            withConfirmed.append(word)
+    if len(confirmed) > 0:
+        for word in noAvoids:
+            filterIn = True
+            for i in range(5):
+                if confirmed[i] != "." and confirmed[i] != word[0][i]:
+                    filterIn = False
+                    break
+            if filterIn:
+                withConfirmed.append(word)
+    else:
+        withConfirmed = noAvoids
 
     withPossible = []
     for word in withConfirmed:
         possibleLetters = [l for l in possible if l != "."]
-        if len([l for l in word if l in possibleLetters]) > 0:
+        if len(list(set([l for l in word[0] if l in possibleLetters]))) == len(list(set(possibleLetters))):
             withPossible.append(word)
 
     final = []
-    for word in withPossible:
-        filterIn = True
-        for i in range(5):
-            if possible[i] != ".":
-                if word[i] == possible[i]:
-                    filterIn = False
-        if filterIn:
-            final.append(word)
+    if len(possible) > 0:
+        for word in withPossible:
+            filterIn = True
+            for i in range(5):
+                if possible[i] != ".":
+                    if word[0][i] == possible[i]:
+                        filterIn = False
+            if filterIn:
+                final.append(word)
+    else:
+        final = withPossible
 
     return final
 
@@ -44,13 +68,18 @@ def possibleWords(inputDict, confirmed, possible, avoid):
 def guess(inputDict=fiveLetters):
 
     if len(inputDict) == 1:
-        print(f"The word is {inputDict[0]}")
+        print(f"The word is {inputDict[0][0]}")
         exit(0)
 
     if inputDict != fiveLetters:
-        print(inputDict)
+        sortedList = sorted(inputDict, key=lambda x: int(x[1]), reverse=True)
+        print("Top 10 guesses:")
+        print([w[0] for w in sortedList[:10]])
 
     inputConfirm = input("Enter confirmed letters: ")
+    if inputConfirm == "restart":
+        guess(fiveLetters)
+
     inputPossible = input("Enter possible letters: ")
     inputAvoid = input("Enter avoid letters: ")
 
