@@ -7,8 +7,6 @@ wordFreq = [w.split() for w in allWords]
 
 fiveLetters = [w for w in wordFreq if len(w[0]) == 5]
 
-# fiveLetters = ["atame", "acher"]
-
 
 def possibleWords(inputDict, confirmed, possible, avoid):
     if len(confirmed) < 5:
